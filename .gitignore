@@ -1,0 +1,24 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+myvenv/
+venv/
+env/
+ENV/
+
+# 2. Caché y archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 3. Base de datos local (para evitar conflictos al hacer git pull)
+*.sqlite3
+db.sqlite3
+
+# 4. Configuración de editores e IDEs (VS Code, PyCharm, etc.)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 5. Archivos del sistema operativo
+.DS_Store
+Thumbs.db
