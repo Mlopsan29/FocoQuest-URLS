@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temarios de un estudiante · FocoQuest</title>
+</head>
+<body>
+    <p><a href="{% url 'index' %}">&larr; Inicio</a></p>
+    <h1>Temarios del estudiante</h1>
+    <p>Estudiante nº {{ id_estudiante }}</p>
+    {% for temario in temarios %}
+        <div>
+            <h2>{{ temario.nombre }}</h2>
+            <h3>Datos del temario</h3>
+            <ul>
+                <li>Nombre: {{ temario.nombre }}</li>
+                <li>Descripción: {{ temario.descripcion|default:"-" }}</li>
+                <li>Color: {{ temario.color }}</li>
+                <li>Fecha de examen: {{ temario.fecha_examen|date:"d/m/Y"|default:"-" }}</li>
+                <li>Horas objetivo: {{ temario.horas_objetivo }}</li>
+                <li>Activo: {{ temario.activa|yesno:"Sí,No" }}</li>
+            </ul>
+            <h3>Estudiante dueño del temario (ManyToOne)</h3>
+            <ul>
+                <li>Objetivo: {{ temario.estudiante.objetivo }}</li>
+                <li>Nivel: {{ temario.estudiante.nivel }}</li>
+                <li>XP: {{ temario.estudiante.xp }}</li>
+                <li>Racha actual: {{ temario.estudiante.racha_actual }}</li>
+                <li>Racha máxima: {{ temario.estudiante.racha_maxima }}</li>
+                <li>Último día activo: {{ temario.estudiante.ultimo_dia_activo|date:"d/m/Y"|default:"-" }}</li>
+                <li>Fecha de nacimiento: {{ temario.estudiante.fecha_nacimiento|date:"d/m/Y"|default:"-" }}</li>
+                <li>Biografía: {{ temario.estudiante.biografia|default:"-" }}</li>
+                <li>Hora de recordatorio: {{ temario.estudiante.hora_recordatorio|time:"H:i"|default:"-" }}</li>
+                <li>Notificaciones push: {{ temario.estudiante.notificaciones_push|yesno:"Sí,No" }}</li>
+                <li>Acepta tratamiento de salud: {{ temario.estudiante.acepta_tratamiento_salud|yesno:"Sí,No" }}</li>
+                <li>Actualizado: {{ temario.estudiante.actualizado|date:"d/m/Y H:i" }}</li>
+            </ul>
+            {% if temario.estudiante.user %}
+                <h4>Usuario (OneToOne)</h4>
+                <ul>
+                    <li>Nombre de usuario: {{ temario.estudiante.user.username }}</li>
+                    <li>Nombre: {{ temario.estudiante.user.first_name|default:"-" }}</li>
+                    <li>Apellidos: {{ temario.estudiante.user.last_name|default:"-" }}</li>
+                    <li>Email: {{ temario.estudiante.user.email|default:"-" }}</li>
+                    <li>Fecha de alta: {{ temario.estudiante.user.date_joined|date:"d/m/Y H:i" }}</li>
+                    <li>Último acceso: {{ temario.estudiante.user.last_login|date:"d/m/Y H:i"|default:"nunca" }}</li>
+                    <li>Es staff: {{ temario.estudiante.user.is_staff|yesno:"Sí,No" }}</li>
+                    <li>Es superusuario: {{ temario.estudiante.user.is_superuser|yesno:"Sí,No" }}</li>
+                    <li>Activo: {{ temario.estudiante.user.is_active|yesno:"Sí,No" }}</li>
+                </ul>
+            {% else %}
+                <p>Sin cuenta de usuario asociada.</p>
+            {% endif %}
+            {% if temario.estudiante.mascota %}
+                <h4>Mascota (OneToOne)</h4>
+                <ul>
+                    <li>Etapa: {{ temario.estudiante.mascota.etapa }}</li>
+                    <li>Energía: {{ temario.estudiante.mascota.energia }}</li>
+                    <li>Color: {{ temario.estudiante.mascota.color }}</li>
+                    <li>Fecha de adopción: {{ temario.estudiante.mascota.fecha_adopcion|date:"d/m/Y" }}</li>
+                    <li>Activa: {{ temario.estudiante.mascota.activa|yesno:"Sí,No" }}</li>
+                </ul>
+            {% else %}
+                <p>Este estudiante no tiene mascota.</p>
+            {% endif %}
+        </div>
+        <hr>
+    {% empty %}
+        <p>Este estudiante no existe o no tiene temarios.</p>
+    {% endfor %}
+</body>
+</html>
