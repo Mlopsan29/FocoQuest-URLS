@@ -5,4 +5,4 @@ from .models import Temario, Psicologo, Estudiante, ObtencionLogro, Trabajador
 def ranking_estudiantes(request):
     estudiantes = Estudiante.objects.select_related("user", "mascota").prefetch_related("temarios")
     estudiantes = estudiantes.order_by("-xp")[:3]
-    return render(request, 'FocoQuest/estudiante/ranking.html', {"estudiantes": estudiantes})
+    return render(request, 'ranking.html', {"estudiantes": estudiantes})
