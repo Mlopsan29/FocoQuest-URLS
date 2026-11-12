@@ -8,7 +8,11 @@ from .models import Psicologo
 # Para cada psicólogo se muestra toda su información, su usuario (OneToOne, opcional) y todas sus especialidades
 # (ManyToMany).
 def psicologos_modalidad_precio(request, modalidad, precio_maximo):
-    # SELECT p.*, u.*
+    psicologos = Psicologo.objects.select_related("user").prefetch_related("especialidades")
+    psicologos = psicologos.filter(modalidad=modalidad, precio_sesion__lte=precio_maximo).order_by("precio_sesion")
+    return render(request, 'FocoQuest/psicologo/por_modalidad_precio.html', {"psicologos": psicologos, "modalidad": modalidad, "precio_maximo": precio_maximo})
+
+# SELECT p.*, u.*
     # FROM FocoQuest_psicologo p
     #   LEFT OUTER JOIN auth_user u ON p.user_id = u.id
     # WHERE p.modalidad = 'modalidad' AND p.precio_sesion <= precio_maximo
@@ -17,6 +21,3 @@ def psicologos_modalidad_precio(request, modalidad, precio_maximo):
     # SELECT esp.*, pe.psicologo_id FROM FocoQuest_especialidad esp
     #   INNER JOIN FocoQuest_psicologo_especialidades pe ON esp.id = pe.especialidad_id
     #   WHERE pe.psicologo_id IN (ids de los psicólogos anteriores);
-    psicologos = Psicologo.objects.select_related("user").prefetch_related("especialidades")
-    psicologos = psicologos.filter(modalidad=modalidad, precio_sesion__lte=precio_maximo).order_by("precio_sesion")
-    return render(request, 'FocoQuest/psicologo/por_modalidad_precio.html', {"psicologos": psicologos, "modalidad": modalidad, "precio_maximo": precio_maximo})
