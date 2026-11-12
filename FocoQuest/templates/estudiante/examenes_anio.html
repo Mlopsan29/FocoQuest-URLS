@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estudiantes con examen en un año · FocoQuest</title>
+  </head>
+  <body>
+    <p><a href="{% url 'index' %}">&larr; Inicio</a></p>
+    <h1>Estudiantes con exámenes en un año</h1>
+    <p>Estudiantes con algún examen en el año <strong>{{ anio }}</strong>.</p>
+    {% for estudiante in estudiantes %}
+    <div>
+      <h2>{{ estudiante.user.username }}</h2>
+      <h3>Datos del estudiante</h3>
+      <ul>
+        <li>Objetivo: {{ estudiante.objetivo }}</li>
+        <li>Nivel: {{ estudiante.nivel }}</li>
+        <li>XP: {{ estudiante.xp }}</li>
+        <li>Racha actual: {{ estudiante.racha_actual }}</li>
+        <li>Racha máxima: {{ estudiante.racha_maxima }}</li>
+        <li>
+          Último día activo: {{
+          estudiante.ultimo_dia_activo|date:"d/m/Y"|default:"-" }}
+        </li>
+        <li>
+          Fecha de nacimiento: {{
+          estudiante.fecha_nacimiento|date:"d/m/Y"|default:"-" }}
+        </li>
+        <li>Biografía: {{ estudiante.biografia|default:"-" }}</li>
+        <li>
+          Hora de recordatorio: {{
+          estudiante.hora_recordatorio|time:"H:i"|default:"-" }}
+        </li>
+        <li>
+          Notificaciones push: {{ estudiante.notificaciones_push|yesno:"Sí,No"
+          }}
+        </li>
+        <li>
+          Acepta tratamiento de salud: {{
+          estudiante.acepta_tratamiento_salud|yesno:"Sí,No" }}
+        </li>
+        <li>Actualizado: {{ estudiante.actualizado|date:"d/m/Y H:i" }}</li>
+      </ul>
+      {% if estudiante.user %}
+      <h4>Usuario (OneToOne)</h4>
+      <ul>
+        <li>Nombre de usuario: {{ estudiante.user.username }}</li>
+        <li>Nombre: {{ estudiante.user.first_name|default:"-" }}</li>
+        <li>Apellidos: {{ estudiante.user.last_name|default:"-" }}</li>
+        <li>Email: {{ estudiante.user.email|default:"-" }}</li>
+        <li>
+          Fecha de alta: {{ estudiante.user.date_joined|date:"d/m/Y H:i" }}
+        </li>
+        <li>
+          Último acceso: {{ estudiante.user.last_login|date:"d/m/Y
+          H:i"|default:"nunca" }}
+        </li>
+        <li>Es staff: {{ estudiante.user.is_staff|yesno:"Sí,No" }}</li>
+        <li>
+          Es superusuario: {{ estudiante.user.is_superuser|yesno:"Sí,No" }}
+        </li>
+        <li>Activo: {{ estudiante.user.is_active|yesno:"Sí,No" }}</li>
+      </ul>
+      {% else %}
+      <p>Sin cuenta de usuario asociada.</p>
+      {% endif %} {% if estudiante.mascota %}
+      <h4>Mascota (OneToOne)</h4>
+      <ul>
+        <li>Etapa: {{ estudiante.mascota.etapa }}</li>
+        <li>Energía: {{ estudiante.mascota.energia }}</li>
+        <li>Color: {{ estudiante.mascota.color }}</li>
+        <li>
+          Fecha de adopción: {{ estudiante.mascota.fecha_adopcion|date:"d/m/Y"
+          }}
+        </li>
+        <li>Activa: {{ estudiante.mascota.activa|yesno:"Sí,No" }}</li>
+      </ul>
+      {% else %}
+      <p>Este estudiante no tiene mascota.</p>
+      {% endif %}
+      <h4>Todos sus temarios (ManyToOne inverso)</h4>
+      {% for temario in estudiante.temarios.all %}
+      <div>
+        <h5>Temario</h5>
+        <ul>
+          <li>Nombre: {{ temario.nombre }}</li>
+          <li>Descripción: {{ temario.descripcion|default:"-" }}</li>
+          <li>Color: {{ temario.color }}</li>
+          <li>
+            Fecha de examen: {{ temario.fecha_examen|date:"d/m/Y"|default:"-" }}
+          </li>
+          <li>Horas objetivo: {{ temario.horas_objetivo }}</li>
+          <li>Activo: {{ temario.activa|yesno:"Sí,No" }}</li>
+        </ul>
+      </div>
+      {% empty %}
+      <p>No tiene temarios.</p>
+      {% endfor %}
+    </div>
+    <hr />
+    {% empty %}
+    <p>Ningún estudiante tiene exámenes ese año.</p>
+    {% endfor %}
+  </body>
+</html>
