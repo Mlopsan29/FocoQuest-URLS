@@ -1,0 +1,7 @@
+from django.urls import path, re_path
+from . import views
+
+urlpatterns = [
+    # URL 3
+    path('psicologos/<str:modalidad>/<int:precio_maximo>/', views.psicologos_modalidad_precio, name='psicologos_modalidad_precio'),
+]

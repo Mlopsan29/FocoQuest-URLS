@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psicólogos por modalidad y precio · FocoQuest</title>
+</head>
+
+<body>
+    <p><a href="{% url 'index' %}">&larr; Inicio</a></p>
+    <h1>Psicólogos por modalidad y precio máximo</h1>
+    <p>Modalidad: <strong>{{ modalidad }}</strong> · Precio máximo por sesión: <strong>{{ precio_maximo }} €</strong>
+    </p>
+    {% for psicologo in psicologos %}
+    <div>
+        <h2>{{ psicologo.nombre_completo }}</h2>
+        <h3>Datos del psicólogo</h3>
+        <ul>
+            <li>Nombre completo: {{ psicologo.nombre_completo }}</li>
+            <li>Nº de colegiado: {{ psicologo.numero_colegiado }}</li>
+            <li>Descripción: {{ psicologo.descripcion }}</li>
+            <li>Email: {{ psicologo.email }}</li>
+            <li>Teléfono: {{ psicologo.telefono|default:"-" }}</li>
+            <li>Web: {{ psicologo.web|default:"-" }}</li>
+            <li>Modalidad: {{ psicologo.modalidad }}</li>
+            <li>Precio por sesión (€): {{ psicologo.precio_sesion|default:"-" }}</li>
+            <li>Fecha de alta: {{ psicologo.fecha_alta|date:"d/m/Y" }}</li>
+        </ul>
+        {% if psicologo.user %}
+        <h4>Cuenta de usuario del psicólogo (OneToOne)</h4>
+        <ul>
+            <li>Nombre de usuario: {{ psicologo.user.username }}</li>
+            <li>Nombre: {{ psicologo.user.first_name|default:"-" }}</li>
+            <li>Apellidos: {{ psicologo.user.last_name|default:"-" }}</li>
+            <li>Email: {{ psicologo.user.email|default:"-" }}</li>
+            <li>Fecha de alta: {{ psicologo.user.date_joined|date:"d/m/Y H:i" }}</li>
+            <li>Último acceso: {{ psicologo.user.last_login|date:"d/m/Y H:i"|default:"nunca" }}</li>
+            <li>Es staff: {{ psicologo.user.is_staff|yesno:"Sí,No" }}</li>
+            <li>Es superusuario: {{ psicologo.user.is_superuser|yesno:"Sí,No" }}</li>
+            <li>Activo: {{ psicologo.user.is_active|yesno:"Sí,No" }}</li>
+        </ul>
+        {% else %}
+        <p>Sin cuenta de usuario asociada.</p>
+        {% endif %}
+        <h4>Especialidades (ManyToMany)</h4>
+        {% for esp in psicologo.especialidades.all %}
+        <h5>Especialidad</h5>
+        <ul>
+            <li>Nombre: {{ esp.nombre }}</li>
+            <li>Descripción: {{ esp.descripcion|default:"-" }}</li>
+            <li>Orden: {{ esp.orden }}</li>
+            <li>Activa: {{ esp.activa|yesno:"Sí,No" }}</li>
+        </ul>
+        {% empty %}
+        <p>Sin especialidades.</p>
+        {% endfor %}
+    </div>
+    <hr>
+    {% empty %}
+    <p>No hay psicólogos con esa modalidad y ese precio.</p>
+    {% endfor %}
+</body>
+
+</html>
