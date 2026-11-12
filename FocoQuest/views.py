@@ -2,11 +2,6 @@ from django.shortcuts import render
 from .models import Temario, Psicologo, Estudiante, ObtencionLogro, Trabajador
 
 
-# Index: muestra el listado de enlaces desde el que se accede a todas las URLs de la aplicación.
-def index(request):
-    return render(request, 'index.html')
-
-
 # URL 1: temarios de un estudiante.
 # Recibe un parámetro ENTERO (el id del estudiante) y muestra todos sus temarios ordenados por fecha de examen
 # (ManyToOne: un estudiante tiene muchos temarios). De cada temario se muestra también toda la información de su
