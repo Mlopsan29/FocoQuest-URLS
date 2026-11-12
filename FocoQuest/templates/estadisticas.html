@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas de psicólogos · FocoQuest</title>
+</head>
+
+<body>
+    <p><a href="{% url 'index' %}">&larr; Inicio</a></p>
+    <h1>Estadísticas de precios de los psicólogos</h1>
+    <h2>Estadísticas de precios (aggregate)</h2>
+    <ul>
+        <li>Psicólogos con precio indicado: {{ estadisticas.total }}</li>
+        <li>Precio medio por sesión: {{ estadisticas.precio_medio|floatformat:2 }} €</li>
+        <li>Precio mínimo: {{ estadisticas.precio_minimo|floatformat:2 }} €</li>
+        <li>Precio máximo: {{ estadisticas.precio_maximo|floatformat:2 }} €</li>
+        <li>Psicólogos sin precio indicado (consulta gratuita u orientativa): {{ sin_precio }}</li>
+    </ul>
+    <h2>Psicólogos con precio indicado, del más barato al más caro</h2>
+    {% for psicologo in psicologos %}
+    <div>
+        <h2>{{ psicologo.nombre_completo }} · {{ psicologo.precio_sesion }} €</h2>
+        <h3>Datos del psicólogo</h3>
+        <ul>
+            <li>Nombre completo: {{ psicologo.nombre_completo }}</li>
+            <li>Nº de colegiado: {{ psicologo.numero_colegiado }}</li>
+            <li>Descripción: {{ psicologo.descripcion }}</li>
+            <li>Email: {{ psicologo.email }}</li>
+            <li>Teléfono: {{ psicologo.telefono|default:"-" }}</li>
+            <li>Web: {{ psicologo.web|default:"-" }}</li>
+            <li>Modalidad: {{ psicologo.modalidad }}</li>
+            <li>Precio por sesión (€): {{ psicologo.precio_sesion|default:"-" }}</li>
+            <li>Fecha de alta: {{ psicologo.fecha_alta|date:"d/m/Y" }}</li>
+        </ul>
+        {% if psicologo.user %}
+        <h4>Cuenta de usuario del psicólogo (OneToOne)</h4>
+        <ul>
+            <li>Nombre de usuario: {{ psicologo.user.username }}</li>
+            <li>Nombre: {{ psicologo.user.first_name|default:"-" }}</li>
+            <li>Apellidos: {{ psicologo.user.last_name|default:"-" }}</li>
+            <li>Email: {{ psicologo.user.email|default:"-" }}</li>
+            <li>Fecha de alta: {{ psicologo.user.date_joined|date:"d/m/Y H:i" }}</li>
+            <li>Último acceso: {{ psicologo.user.last_login|date:"d/m/Y H:i"|default:"nunca" }}</li>
+            <li>Es staff: {{ psicologo.user.is_staff|yesno:"Sí,No" }}</li>
+            <li>Es superusuario: {{ psicologo.user.is_superuser|yesno:"Sí,No" }}</li>
+            <li>Activo: {{ psicologo.user.is_active|yesno:"Sí,No" }}</li>
+        </ul>
+        {% else %}
+        <p>Sin cuenta de usuario asociada.</p>
+        {% endif %}
+        <h4>Especialidades (ManyToMany)</h4>
+        {% for esp in psicologo.especialidades.all %}
+        <h5>Especialidad</h5>
+        <ul>
+            <li>Nombre: {{ esp.nombre }}</li>
+            <li>Descripción: {{ esp.descripcion|default:"-" }}</li>
+            <li>Orden: {{ esp.orden }}</li>
+            <li>Activa: {{ esp.activa|yesno:"Sí,No" }}</li>
+        </ul>
+        {% empty %}
+        <p>Sin especialidades.</p>
+        {% endfor %}
+    </div>
+    <hr>
+    {% empty %}
+    <p>No hay psicólogos con precio indicado.</p>
+    {% endfor %}
+</body>
+
+</html>
