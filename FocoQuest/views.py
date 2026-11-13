@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Temario, Psicologo, Estudiante, ObtencionLogro, Trabajador
-
+from django.db.models import Q, Avg, Min, Max, Count
 
 # URL 1: temarios de un estudiante.
 # Recibe un parámetro ENTERO (el id del estudiante) y muestra todos sus temarios ordenados por fecha de examen
@@ -54,8 +54,6 @@ def psicologos_especialidad(request, nombre_especialidad):
     #   WHERE tf.psicologo_id IN (...);
     # SELECT u.* FROM auth_user u WHERE u.id IN (user_id de esos trabajadores);
 
-from .models import Psicologo
-
 
 # URL 3: psicólogos por modalidad y precio máximo.
 # Recibe DOS parámetros (un string con la modalidad y un entero con el precio máximo por sesión) y muestra los
@@ -76,8 +74,6 @@ def psicologos_modalidad_precio(request, modalidad, precio_maximo):
     # SELECT esp.*, pe.psicologo_id FROM FocoQuest_especialidad esp
     #   INNER JOIN FocoQuest_psicologo_especialidades pe ON esp.id = pe.especialidad_id
     #   WHERE pe.psicologo_id IN (ids de los psicólogos anteriores);
-from .models import Estudiante
-from django.db.models import Q
 
 
 # URL 4: estudiantes destacados.
@@ -100,9 +96,6 @@ def estudiantes_destacados(request):
     #
     # SELECT o.* FROM FocoQuest_obtencionlogro o WHERE o.estudiante_id IN (ids de los estudiantes anteriores);
     # SELECT l.* FROM FocoQuest_logro l WHERE l.id IN (logro_id de esas obtenciones);
-from django.core.exceptions import BadRequest, PermissionDenied
-from .models import Temario, Psicologo, Estudiante, ObtencionLogro, Trabajador
-from django.db.models import Q, Avg, Min, Max, Count
 
 
 # URL 5: estadísticas de precios de los psicólogos (AGGREGATE).
@@ -172,10 +165,6 @@ def estudiantes_examen_anio(request, anio):
     estudiantes = Estudiante.objects.select_related("user", "mascota").prefetch_related("temarios")
     estudiantes = estudiantes.filter(temarios__fecha_examen__year=anio).distinct().order_by("user__username")
     return render(request, 'FocoQuest/estudiante/examenes_anio.html', {"estudiantes": estudiantes, "anio": anio})
-from django.core.exceptions import BadRequest, PermissionDenied
-from .models import Temario, Psicologo, Estudiante, ObtencionLogro, Trabajador
-from django.db.models import Q, Avg, Min, Max, Count
-# Create your views here.
 
 # URL 8: estudiantes que no tienen ningún logro.
 # Usa un filtro con None sobre la TABLA INTERMEDIA ObtencionLogro (a través de su related_name "obtenciones"):
@@ -194,18 +183,10 @@ def estudiantes_sin_logros(request):
     # SELECT p.*, ef.estudiante_id FROM FocoQuest_psicologo p
     #   INNER JOIN FocoQuest_estudiante_psicologos_favoritos ef ON p.id = ef.psicologo_id
     #   WHERE ef.estudiante_id IN (ids de los estudiantes anteriores);
-    # SELECT u.* FROM auth_user u WHERE u.id IN (user_id de esos psicólogos);
-    # SELECT esp.*, pe.psicologo_id FROM FocoQuest_especialidad esp
-    #   INNER JOIN FocoQuest_psicologo_especialidades pe ON esp.id = pe.especialidad_id
-    #   WHERE pe.psicologo_id IN (ids de esos psicólogos);
     estudiantes = Estudiante.objects.select_related("user", "mascota")
     estudiantes = estudiantes.prefetch_related("psicologos_favoritos__user", "psicologos_favoritos__especialidades")
     estudiantes = estudiantes.filter(obtenciones=None).order_by("user__username")
     return render(request, 'FocoQuest/estudiante/sin_logros.html', {"estudiantes": estudiantes})
-from django.core.exceptions import BadRequest, PermissionDenied
-from .models import Temario, Psicologo, Estudiante, ObtencionLogro, Trabajador
-from django.db.models import Q, Avg, Min, Max, Count
-# Create your views here.
 
 # URL 9: estudiantes que han obtenido un logro.
 # Recibe un parámetro ENTERO (el id del logro) y consulta directamente la TABLA INTERMEDIA ObtencionLogro, que
@@ -224,3 +205,26 @@ def estudiantes_logro(request, id_logro):
     obtenciones = ObtencionLogro.objects.select_related("estudiante__user", "estudiante__mascota", "logro")
     obtenciones = obtenciones.filter(logro=id_logro).order_by("-progreso")
     return render(request, 'FocoQuest/logro/estudiantes.html', {"obtenciones": obtenciones, "id_logro": id_logro})
+    
+
+# # URL 10: trabajadores y sus psicólogos favoritos.
+# Muestra todos los trabajadores ordenados por apellido (order_by sobre un campo de la tabla User relacionada).
+# De cada uno se muestra toda su información, su usuario (OneToOne) y sus psicólogos favoritos (ManyToMany), y de
+# cada psicólogo su usuario (OneToOne, opcional) y todas sus especialidades (ManyToMany).
+def trabajadores_favoritos(request):
+    # SELECT t.*, u.*
+    # FROM FocoQuest_trabajador t
+    #   INNER JOIN auth_user u ON t.user_id = u.id
+    # ORDER BY u.last_name ASC;
+    #
+    # SELECT p.*, tf.trabajador_id FROM FocoQuest_psicologo p
+    #   INNER JOIN FocoQuest_trabajador_psicologos_favoritos tf ON p.id = tf.psicologo_id
+    #   WHERE tf.trabajador_id IN (ids de los trabajadores anteriores);
+    # SELECT u.* FROM auth_user u WHERE u.id IN (user_id de esos psicólogos);
+    # SELECT esp.*, pe.psicologo_id FROM FocoQuest_especialidad esp
+    #   INNER JOIN FocoQuest_psicologo_especialidades pe ON esp.id = pe.especialidad_id
+    #   WHERE pe.psicologo_id IN (ids de esos psicólogos);
+    trabajadores = Trabajador.objects.select_related("user")
+    trabajadores = trabajadores.prefetch_related("psicologos_favoritos__user", "psicologos_favoritos__especialidades")
+    trabajadores = trabajadores.order_by("user__last_name")
+    return render(request, 'FocoQuest/trabajador/favoritos.html', {"trabajadores": trabajadores})

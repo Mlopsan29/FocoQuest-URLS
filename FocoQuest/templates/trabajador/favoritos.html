@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psicólogos favoritos de los trabajadores · FocoQuest</title>
+</head>
+<body>
+    <p><a href="{% url 'index' %}">&larr; Inicio</a></p>
+    <h1>Psicólogos favoritos de los trabajadores</h1>
+    <p>Trabajadores ordenados por apellido, con sus psicólogos favoritos.</p>
+    {% for trabajador in trabajadores %}
+        <div>
+            <h2>{{ trabajador.user.first_name }} {{ trabajador.user.last_name }}</h2>
+            <h3>Datos del trabajador</h3>
+            <ul>
+                <li>Objetivo: {{ trabajador.objetivo }}</li>
+                <li>Fecha de nacimiento: {{ trabajador.fecha_nacimiento|date:"d/m/Y"|default:"-" }}</li>
+                <li>Biografía: {{ trabajador.biografia|default:"-" }}</li>
+                <li>Acepta tratamiento de salud: {{ trabajador.acepta_tratamiento_salud|yesno:"Sí,No" }}</li>
+                <li>Último día activo: {{ trabajador.ultimo_dia_activo|date:"d/m/Y"|default:"-" }}</li>
+            </ul>
+            {% if trabajador.user %}
+                <h4>Usuario (OneToOne)</h4>
+                <ul>
+                    <li>Nombre de usuario: {{ trabajador.user.username }}</li>
+                    <li>Nombre: {{ trabajador.user.first_name|default:"-" }}</li>
+                    <li>Apellidos: {{ trabajador.user.last_name|default:"-" }}</li>
+                    <li>Email: {{ trabajador.user.email|default:"-" }}</li>
+                    <li>Fecha de alta: {{ trabajador.user.date_joined|date:"d/m/Y H:i" }}</li>
+                    <li>Último acceso: {{ trabajador.user.last_login|date:"d/m/Y H:i"|default:"nunca" }}</li>
+                    <li>Es staff: {{ trabajador.user.is_staff|yesno:"Sí,No" }}</li>
+                    <li>Es superusuario: {{ trabajador.user.is_superuser|yesno:"Sí,No" }}</li>
+                    <li>Activo: {{ trabajador.user.is_active|yesno:"Sí,No" }}</li>
+                </ul>
+            {% else %}
+                <p>Sin cuenta de usuario asociada.</p>
+            {% endif %}
+            <h4>Psicólogos favoritos (ManyToMany)</h4>
+            {% for psi in trabajador.psicologos_favoritos.all %}
+                <div>
+                <h5>Psicólogo favorito</h5>
+                <ul>
+                    <li>Nombre completo: {{ psi.nombre_completo }}</li>
+                    <li>Nº de colegiado: {{ psi.numero_colegiado }}</li>
+                    <li>Descripción: {{ psi.descripcion }}</li>
+                    <li>Email: {{ psi.email }}</li>
+                    <li>Teléfono: {{ psi.telefono|default:"-" }}</li>
+                    <li>Web: {{ psi.web|default:"-" }}</li>
+                    <li>Modalidad: {{ psi.modalidad }}</li>
+                    <li>Precio por sesión (€): {{ psi.precio_sesion|default:"-" }}</li>
+                    <li>Fecha de alta: {{ psi.fecha_alta|date:"d/m/Y" }}</li>
+                </ul>
+                {% if psi.user %}
+                    <h4>Cuenta de usuario del psicólogo (OneToOne)</h4>
+                    <ul>
+                        <li>Nombre de usuario: {{ psi.user.username }}</li>
+                        <li>Nombre: {{ psi.user.first_name|default:"-" }}</li>
+                        <li>Apellidos: {{ psi.user.last_name|default:"-" }}</li>
+                        <li>Email: {{ psi.user.email|default:"-" }}</li>
+                        <li>Fecha de alta: {{ psi.user.date_joined|date:"d/m/Y H:i" }}</li>
+                        <li>Último acceso: {{ psi.user.last_login|date:"d/m/Y H:i"|default:"nunca" }}</li>
+                        <li>Es staff: {{ psi.user.is_staff|yesno:"Sí,No" }}</li>
+                        <li>Es superusuario: {{ psi.user.is_superuser|yesno:"Sí,No" }}</li>
+                        <li>Activo: {{ psi.user.is_active|yesno:"Sí,No" }}</li>
+                    </ul>
+                {% else %}
+                    <p>Sin cuenta de usuario asociada.</p>
+                {% endif %}
+                <h4>Especialidades (ManyToMany)</h4>
+                {% for esp in psi.especialidades.all %}
+                    <h5>Especialidad</h5>
+                    <ul>
+                        <li>Nombre: {{ esp.nombre }}</li>
+                        <li>Descripción: {{ esp.descripcion|default:"-" }}</li>
+                        <li>Orden: {{ esp.orden }}</li>
+                        <li>Activa: {{ esp.activa|yesno:"Sí,No" }}</li>
+                    </ul>
+                {% empty %}
+                    <p>Sin especialidades.</p>
+                {% endfor %}
+                </div>
+            {% empty %}
+                <p>No tiene psicólogos favoritos.</p>
+            {% endfor %}
+        </div>
+        <hr>
+    {% empty %}
+        <p>No hay trabajadores.</p>
+    {% endfor %}
+</body>
+</html>
