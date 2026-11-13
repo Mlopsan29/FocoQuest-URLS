@@ -2,6 +2,9 @@ from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
+# Index: desde aquí se accede a todas las URLs
+path('', views.index, name='index'),
+
 # URL 1
 path('estudiante/<int:id_estudiante>/temarios/', views.temarios_estudiante, name='temarios_estudiante'),
     
@@ -35,4 +38,5 @@ path('trabajadores/favoritos/', views.trabajadores_favoritos, name='trabajadores
 path('probar-error/400/', views.probar_error_400, name='probar_error_400'),
 path('probar-error/403/', views.probar_error_403, name='probar_error_403'),
 path('probar-error/500/', views.probar_error_500, name='probar_error_500'),
+
 ]

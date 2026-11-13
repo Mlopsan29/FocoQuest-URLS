@@ -1,20 +1,32 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FocoQuest</title>
-  </head>
-  <body>
+</head>
+<body>
     <h1>FOCOQUEST</h1>
     <h2>Listado de enlaces</h2>
     <ul>
-      <li>
-        <a href="{% url 'temarios_estudiante' 1 %}"
-          >URL 1 · Temarios del estudiante 1</a
-        >
-      </li>
+        <li><a href="{% url 'temarios_estudiante' 1 %}">URL 1 · Temarios del estudiante 1</a></li>
+        <li><a href="{% url 'psicologos_especialidad' 'Wife between still then.' %}">URL 2 · Psicólogos de la especialidad «Ansiedad»</a></li>
+        <li><a href="{% url 'psicologos_modalidad_precio' 'Online' 50 %}">URL 3 · Psicólogos «Online» de hasta 50 € por sesión</a></li>
+        <li><a href="{% url 'estudiantes_destacados' %}">URL 4 · Estudiantes destacados (nivel alto o racha alta)</a></li>
+        <li><a href="{% url 'psicologos_estadisticas' %}">URL 5 · Estadísticas de precios de los psicólogos (aggregate)</a></li>
+        <li><a href="{% url 'ranking_estudiantes' %}">URL 6 · Ranking: los 3 estudiantes con más XP</a></li>
+        <li><a href="{% url 'estudiantes_examen_anio' 2025 %}">URL 7 · Estudiantes con algún examen en 2027 (re_path)</a></li>
+        <li><a href="{% url 'estudiantes_sin_logros' %}">URL 8 · Estudiantes sin ningún logro (None en tabla intermedia)</a></li>
+        <li><a href="{% url 'estudiantes_logro' 10 %}">URL 9 · Estudiantes que han obtenido el logro 10</a></li>
+        <li><a href="{% url 'trabajadores_favoritos' %}">URL 10 · Trabajadores y sus psicólogos favoritos</a></li>
     </ul>
-  </body>
+
+    <h2>Comprobación de páginas de error</h2>
+    <ul>
+        <li><a href="{% url 'probar_error_400' %}">Error 400</a></li>
+        <li><a href="{% url 'probar_error_403' %}">Error 403</a></li>
+        <li><a href="/esta-pagina-no-existe/">Error 404</a></li>
+        <li><a href="{% url 'probar_error_500' %}">Error 500</a></li>
+    </ul>
+</body>
 </html>

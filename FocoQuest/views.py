@@ -1,6 +1,11 @@
 from django.shortcuts import render
+from django.core.exceptions import SuspiciousOperation, PermissionDenied
 from .models import Temario, Psicologo, Estudiante, ObtencionLogro, Trabajador
 from django.db.models import Q, Avg, Min, Max, Count
+
+# Index: muestra el listado de enlaces desde el que se accede a todas las URLs de la aplicación.
+def index(request):
+    return render(request, 'index.html')
 
 # URL 1: temarios de un estudiante.
 # Recibe un parámetro ENTERO (el id del estudiante) y muestra todos sus temarios ordenados por fecha de examen
@@ -63,7 +68,7 @@ def psicologos_especialidad(request, nombre_especialidad):
 def psicologos_modalidad_precio(request, modalidad, precio_maximo):
     psicologos = Psicologo.objects.select_related("user").prefetch_related("especialidades")
     psicologos = psicologos.filter(modalidad=modalidad, precio_sesion__lte=precio_maximo).order_by("precio_sesion")
-    return render(request, 'FocoQuest/psicologo/por_modalidad_precio.html', {"psicologos": psicologos, "modalidad": modalidad, "precio_maximo": precio_maximo})
+    return render(request, 'por_modalidad_precio.html', {"psicologos": psicologos, "modalidad": modalidad, "precio_maximo": precio_maximo})
 
 # SELECT p.*, u.*
     # FROM FocoQuest_psicologo p
@@ -85,7 +90,7 @@ def psicologos_modalidad_precio(request, modalidad, precio_maximo):
 def estudiantes_destacados(request):
     estudiantes = Estudiante.objects.select_related("user", "mascota").prefetch_related("obtenciones__logro")
     estudiantes = estudiantes.filter(Q(nivel__gte=8) | Q(racha_actual__gte=10)).order_by("-nivel")
-    return render(request, 'FocoQuest/estudiante/destacados.html', {"estudiantes": estudiantes})
+    return render(request, 'destacados.html', {"estudiantes": estudiantes})
 
 # SELECT e.*, u.*, m.*
     # FROM FocoQuest_estudiante e
@@ -125,7 +130,7 @@ def psicologos_estadisticas(request):
     #     INNER JOIN FocoQuest_psicologo_especialidades pe ON esp.id = pe.especialidad_id
     #     WHERE pe.psicologo_id IN (ids de los psicólogos anteriores);
     psicologos = con_precio.select_related("user").prefetch_related("especialidades").order_by("precio_sesion")
-    return render(request, 'FocoQuest/psicologo/estadisticas.html', {"estadisticas": estadisticas, "sin_precio": sin_precio, "psicologos": psicologos})
+    return render(request, 'estadisticas.html', {"estadisticas": estadisticas, "sin_precio": sin_precio, "psicologos": psicologos})
 
 # Create your views here.
 # URL 6: ranking de los 3 estudiantes con más experiencia.
@@ -143,7 +148,7 @@ def ranking_estudiantes(request):
     # SELECT t.* FROM FocoQuest_temario t WHERE t.estudiante_id IN (ids de los 3 estudiantes);
     estudiantes = Estudiante.objects.select_related("user", "mascota").prefetch_related("temarios")
     estudiantes = estudiantes.order_by("-xp")[:3]
-    return render(request, 'FocoQuest/estudiante/ranking.html', {"estudiantes": estudiantes})
+    return render(request, 'ranking.html', {"estudiantes": estudiantes})
 # Create your views here.
 
 # URL 7: estudiantes con algún examen en un año concreto (URL con re_path y expresión regular).
@@ -164,7 +169,7 @@ def estudiantes_examen_anio(request, anio):
     # SELECT t.* FROM FocoQuest_temario t WHERE t.estudiante_id IN (ids de los estudiantes anteriores);
     estudiantes = Estudiante.objects.select_related("user", "mascota").prefetch_related("temarios")
     estudiantes = estudiantes.filter(temarios__fecha_examen__year=anio).distinct().order_by("user__username")
-    return render(request, 'FocoQuest/estudiante/examenes_anio.html', {"estudiantes": estudiantes, "anio": anio})
+    return render(request, 'estudiante/examenes_anio.html', {"estudiantes": estudiantes, "anio": anio})
 
 # URL 8: estudiantes que no tienen ningún logro.
 # Usa un filtro con None sobre la TABLA INTERMEDIA ObtencionLogro (a través de su related_name "obtenciones"):
@@ -186,7 +191,7 @@ def estudiantes_sin_logros(request):
     estudiantes = Estudiante.objects.select_related("user", "mascota")
     estudiantes = estudiantes.prefetch_related("psicologos_favoritos__user", "psicologos_favoritos__especialidades")
     estudiantes = estudiantes.filter(obtenciones=None).order_by("user__username")
-    return render(request, 'FocoQuest/estudiante/sin_logros.html', {"estudiantes": estudiantes})
+    return render(request, 'estudiante/sin_logros.html', {"estudiantes": estudiantes})
 
 # URL 9: estudiantes que han obtenido un logro.
 # Recibe un parámetro ENTERO (el id del logro) y consulta directamente la TABLA INTERMEDIA ObtencionLogro, que
@@ -204,7 +209,7 @@ def estudiantes_logro(request, id_logro):
     # ORDER BY o.progreso DESC;
     obtenciones = ObtencionLogro.objects.select_related("estudiante__user", "estudiante__mascota", "logro")
     obtenciones = obtenciones.filter(logro=id_logro).order_by("-progreso")
-    return render(request, 'FocoQuest/logro/estudiantes.html', {"obtenciones": obtenciones, "id_logro": id_logro})
+    return render(request, 'logro/estudiantes.html', {"obtenciones": obtenciones, "id_logro": id_logro})
     
 
 # # URL 10: trabajadores y sus psicólogos favoritos.
@@ -227,22 +232,34 @@ def trabajadores_favoritos(request):
     trabajadores = Trabajador.objects.select_related("user")
     trabajadores = trabajadores.prefetch_related("psicologos_favoritos__user", "psicologos_favoritos__especialidades")
     trabajadores = trabajadores.order_by("user__last_name")
-    return render(request, 'FocoQuest/trabajador/favoritos.html', {"trabajadores": trabajadores})
+    return render(request, 'trabajador/favoritos.html', {"trabajadores": trabajadores})
+
 # Error 400: petición incorrecta.
 def mi_error_400(request, exception=None):
-    return render(request, 'FocoQuest/errores/400.html', None, None, 400)
+    return render(request, '400.html', None, None, 400)
 
 
 # Error 403: acceso prohibido.
 def mi_error_403(request, exception=None):
-    return render(request, 'FocoQuest/errores/403.html', None, None, 403)
+    return render(request, '403.html', None, None, 403)
 
 
 # Error 404: página no encontrada.
 def mi_error_404(request, exception=None):
-    return render(request, 'FocoQuest/errores/404.html', None, None, 404)
+    return render(request, '404.html', None, None, 404)
 
 
 # Error 500: error interno del servidor.
 def mi_error_500(request, exception=None):
-    return render(request, 'FocoQuest/errores/500.html', None, None, 500)
+    return render(request, '500.html', None, None, 500)
+
+def probar_error_400(request):
+    raise SuspiciousOperation("Prueba de error 400")
+ 
+ 
+def probar_error_403(request):
+    raise PermissionDenied("Prueba de error 403")
+ 
+ 
+def probar_error_500(request):
+    raise Exception("Prueba de error 500")
