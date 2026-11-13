@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estudiantes de un logro · FocoQuest</title>
+  </head>
+  <body>
+    <p><a href="{% url 'index' %}">&larr; Inicio</a></p>
+    <h1>Estudiantes que han obtenido un logro</h1>
+    <p>Logro nº {{ id_logro }}</p>
+    {% for obtencion in obtenciones %}
+    <div>
+      <h2>
+        {{ obtencion.estudiante.user.username }} · {{ obtencion.progreso }} %
+      </h2>
+      <h3>Datos de la obtención (tabla intermedia ObtencionLogro)</h3>
+      <ul>
+        <li>
+          Fecha de obtención: {{ obtencion.fecha_obtencion|date:"d/m/Y H:i" }}
+        </li>
+        <li>Progreso (%): {{ obtencion.progreso }}</li>
+        <li>Destacado: {{ obtencion.destacado|yesno:"Sí,No" }}</li>
+        <li>Notificado: {{ obtencion.notificado|yesno:"Sí,No" }}</li>
+      </ul>
+      <h3>Logro (ManyToOne)</h3>
+      <ul>
+        <li>Código: {{ obtencion.logro.codigo }}</li>
+        <li>Nombre: {{ obtencion.logro.nombre }}</li>
+        <li>Descripción: {{ obtencion.logro.descripcion }}</li>
+        <li>XP de recompensa: {{ obtencion.logro.xp_recompensa }}</li>
+        <li>Icono: {{ obtencion.logro.icono_url|default:"-" }}</li>
+      </ul>
+      <h3>Estudiante (ManyToOne)</h3>
+      <ul>
+        <li>Objetivo: {{ obtencion.estudiante.objetivo }}</li>
+        <li>Nivel: {{ obtencion.estudiante.nivel }}</li>
+        <li>XP: {{ obtencion.estudiante.xp }}</li>
+        <li>Racha actual: {{ obtencion.estudiante.racha_actual }}</li>
+        <li>Racha máxima: {{ obtencion.estudiante.racha_maxima }}</li>
+        <li>
+          Último día activo: {{
+          obtencion.estudiante.ultimo_dia_activo|date:"d/m/Y"|default:"-" }}
+        </li>
+        <li>
+          Fecha de nacimiento: {{
+          obtencion.estudiante.fecha_nacimiento|date:"d/m/Y"|default:"-" }}
+        </li>
+        <li>Biografía: {{ obtencion.estudiante.biografia|default:"-" }}</li>
+        <li>
+          Hora de recordatorio: {{
+          obtencion.estudiante.hora_recordatorio|time:"H:i"|default:"-" }}
+        </li>
+        <li>
+          Notificaciones push: {{
+          obtencion.estudiante.notificaciones_push|yesno:"Sí,No" }}
+        </li>
+        <li>
+          Acepta tratamiento de salud: {{
+          obtencion.estudiante.acepta_tratamiento_salud|yesno:"Sí,No" }}
+        </li>
+        <li>
+          Actualizado: {{ obtencion.estudiante.actualizado|date:"d/m/Y H:i" }}
+        </li>
+      </ul>
+      {% if obtencion.estudiante.user %}
+      <h4>Usuario (OneToOne)</h4>
+      <ul>
+        <li>Nombre de usuario: {{ obtencion.estudiante.user.username }}</li>
+        <li>Nombre: {{ obtencion.estudiante.user.first_name|default:"-" }}</li>
+        <li>
+          Apellidos: {{ obtencion.estudiante.user.last_name|default:"-" }}
+        </li>
+        <li>Email: {{ obtencion.estudiante.user.email|default:"-" }}</li>
+        <li>
+          Fecha de alta: {{ obtencion.estudiante.user.date_joined|date:"d/m/Y
+          H:i" }}
+        </li>
+        <li>
+          Último acceso: {{ obtencion.estudiante.user.last_login|date:"d/m/Y
+          H:i"|default:"nunca" }}
+        </li>
+        <li>
+          Es staff: {{ obtencion.estudiante.user.is_staff|yesno:"Sí,No" }}
+        </li>
+        <li>
+          Es superusuario: {{
+          obtencion.estudiante.user.is_superuser|yesno:"Sí,No" }}
+        </li>
+        <li>Activo: {{ obtencion.estudiante.user.is_active|yesno:"Sí,No" }}</li>
+      </ul>
+      {% else %}
+      <p>Sin cuenta de usuario asociada.</p>
+      {% endif %} {% if obtencion.estudiante.mascota %}
+      <h4>Mascota (OneToOne)</h4>
+      <ul>
+        <li>Etapa: {{ obtencion.estudiante.mascota.etapa }}</li>
+        <li>Energía: {{ obtencion.estudiante.mascota.energia }}</li>
+        <li>Color: {{ obtencion.estudiante.mascota.color }}</li>
+        <li>
+          Fecha de adopción: {{
+          obtencion.estudiante.mascota.fecha_adopcion|date:"d/m/Y" }}
+        </li>
+        <li>Activa: {{ obtencion.estudiante.mascota.activa|yesno:"Sí,No" }}</li>
+      </ul>
+      {% else %}
+      <p>Este estudiante no tiene mascota.</p>
+      {% endif %}
+    </div>
+    <hr />
+    {% empty %}
+    <p>Este logro no existe o nadie lo ha conseguido todavía.</p>
+    {% endfor %}
+  </body>
+</html>
