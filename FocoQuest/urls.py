@@ -31,4 +31,8 @@ path('logro/<int:id_logro>/estudiantes/', views.estudiantes_logro, name='estudia
 
 #URL10
 path('trabajadores/favoritos/', views.trabajadores_favoritos, name='trabajadores_favoritos'),
+   # --- URLs de prueba para provocar a mano los errores personalizados ---
+path('probar-error/400/', views.probar_error_400, name='probar_error_400'),
+path('probar-error/403/', views.probar_error_403, name='probar_error_403'),
+path('probar-error/500/', views.probar_error_500, name='probar_error_500'),
 ]

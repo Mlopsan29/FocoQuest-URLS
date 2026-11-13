@@ -21,3 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('FocoQuest.urls')),
 ]
+
+handler400 = 'FocoQuest.views.mi_error_400'
+handler403 = 'FocoQuest.views.mi_error_403'
+handler404 = 'FocoQuest.views.mi_error_404'
+handler500 = 'FocoQuest.views.mi_error_500'
