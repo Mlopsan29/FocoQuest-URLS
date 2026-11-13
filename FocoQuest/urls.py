@@ -16,4 +16,7 @@ path('estudiantes/destacados/', views.estudiantes_destacados, name='estudiantes_
 
 # URL 5
 path('psicologos/estadisticas/', views.psicologos_estadisticas, name='psicologos_estadisticas'),
+
+# URL 6 
+path('estudiantes/ranking/', views.ranking_estudiantes, name='ranking_estudiantes'),
 ]
