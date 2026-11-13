@@ -10,4 +10,7 @@ path('psicologos/especialidad/<str:nombre_especialidad>/', views.psicologos_espe
 
     # URL 3
 path('psicologos/<str:modalidad>/<int:precio_maximo>/', views.psicologos_modalidad_precio, name='psicologos_modalidad_precio'),
+
+# URL 4
+path('estudiantes/destacados/', views.estudiantes_destacados, name='estudiantes_destacados'),
 ]
