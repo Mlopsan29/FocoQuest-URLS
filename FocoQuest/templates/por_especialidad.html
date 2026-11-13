@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psicólogos por especialidad · FocoQuest</title>
+</head>
+<body>
+    <p><a href="{% url 'index' %}">&larr; Inicio</a></p>
+    <h1>Psicólogos de una especialidad</h1>
+    <p>Especialidad buscada: <strong>{{ nombre_especialidad }}</strong></p>
+    {% for psicologo in psicologos %}
+        <div>
+            <h2>{{ psicologo.nombre_completo }}</h2>
+            <h3>Datos del psicólogo</h3>
+            <ul>
+                <li>Nombre completo: {{ psicologo.nombre_completo }}</li>
+                <li>Nº de colegiado: {{ psicologo.numero_colegiado }}</li>
+                <li>Descripción: {{ psicologo.descripcion }}</li>
+                <li>Email: {{ psicologo.email }}</li>
+                <li>Teléfono: {{ psicologo.telefono|default:"-" }}</li>
+                <li>Web: {{ psicologo.web|default:"-" }}</li>
+                <li>Modalidad: {{ psicologo.modalidad }}</li>
+                <li>Precio por sesión (€): {{ psicologo.precio_sesion|default:"-" }}</li>
+                <li>Fecha de alta: {{ psicologo.fecha_alta|date:"d/m/Y" }}</li>
+            </ul>
+            {% if psicologo.user %}
+                <h4>Cuenta de usuario del psicólogo (OneToOne)</h4>
+                <ul>
+                    <li>Nombre de usuario: {{ psicologo.user.username }}</li>
+                    <li>Nombre: {{ psicologo.user.first_name|default:"-" }}</li>
+                    <li>Apellidos: {{ psicologo.user.last_name|default:"-" }}</li>
+                    <li>Email: {{ psicologo.user.email|default:"-" }}</li>
+                    <li>Fecha de alta: {{ psicologo.user.date_joined|date:"d/m/Y H:i" }}</li>
+                    <li>Último acceso: {{ psicologo.user.last_login|date:"d/m/Y H:i"|default:"nunca" }}</li>
+                    <li>Es staff: {{ psicologo.user.is_staff|yesno:"Sí,No" }}</li>
+                    <li>Es superusuario: {{ psicologo.user.is_superuser|yesno:"Sí,No" }}</li>
+                    <li>Activo: {{ psicologo.user.is_active|yesno:"Sí,No" }}</li>
+                </ul>
+            {% else %}
+                <p>Sin cuenta de usuario asociada.</p>
+            {% endif %}
+            <h4>Especialidades (ManyToMany)</h4>
+            {% for esp in psicologo.especialidades.all %}
+                <h5>Especialidad</h5>
+                <ul>
+                    <li>Nombre: {{ esp.nombre }}</li>
+                    <li>Descripción: {{ esp.descripcion|default:"-" }}</li>
+                    <li>Orden: {{ esp.orden }}</li>
+                    <li>Activa: {{ esp.activa|yesno:"Sí,No" }}</li>
+                </ul>
+            {% empty %}
+                <p>Sin especialidades.</p>
+            {% endfor %}
+            <h4>Estudiantes que lo tienen como favorito (ManyToMany inverso)</h4>
+            {% for est in psicologo.seguidores_estudiantes.all %}
+                <div>
+                <h5>Estudiante seguidor</h5>
+                <ul>
+                    <li>Objetivo: {{ est.objetivo }}</li>
+                    <li>Nivel: {{ est.nivel }}</li>
+                    <li>XP: {{ est.xp }}</li>
+                    <li>Racha actual: {{ est.racha_actual }}</li>
+                    <li>Racha máxima: {{ est.racha_maxima }}</li>
+                    <li>Último día activo: {{ est.ultimo_dia_activo|date:"d/m/Y"|default:"-" }}</li>
+                    <li>Fecha de nacimiento: {{ est.fecha_nacimiento|date:"d/m/Y"|default:"-" }}</li>
+                    <li>Biografía: {{ est.biografia|default:"-" }}</li>
+                    <li>Hora de recordatorio: {{ est.hora_recordatorio|time:"H:i"|default:"-" }}</li>
+                    <li>Notificaciones push: {{ est.notificaciones_push|yesno:"Sí,No" }}</li>
+                    <li>Acepta tratamiento de salud: {{ est.acepta_tratamiento_salud|yesno:"Sí,No" }}</li>
+                    <li>Actualizado: {{ est.actualizado|date:"d/m/Y H:i" }}</li>
+                </ul>
+                {% if est.user %}
+                    <h4>Usuario del estudiante (OneToOne)</h4>
+                    <ul>
+                        <li>Nombre de usuario: {{ est.user.username }}</li>
+                        <li>Nombre: {{ est.user.first_name|default:"-" }}</li>
+                        <li>Apellidos: {{ est.user.last_name|default:"-" }}</li>
+                        <li>Email: {{ est.user.email|default:"-" }}</li>
+                        <li>Fecha de alta: {{ est.user.date_joined|date:"d/m/Y H:i" }}</li>
+                        <li>Último acceso: {{ est.user.last_login|date:"d/m/Y H:i"|default:"nunca" }}</li>
+                        <li>Es staff: {{ est.user.is_staff|yesno:"Sí,No" }}</li>
+                        <li>Es superusuario: {{ est.user.is_superuser|yesno:"Sí,No" }}</li>
+                        <li>Activo: {{ est.user.is_active|yesno:"Sí,No" }}</li>
+                    </ul>
+                {% else %}
+                    <p>Sin cuenta de usuario asociada.</p>
+                {% endif %}
+                </div>
+            {% empty %}
+                <p>Ningún estudiante lo tiene como favorito.</p>
+            {% endfor %}
+            <h4>Trabajadores que lo tienen como favorito (ManyToMany inverso)</h4>
+            {% for tra in psicologo.seguidores_trabajadores.all %}
+                <div>
+                <h5>Trabajador seguidor</h5>
+                <ul>
+                    <li>Objetivo: {{ tra.objetivo }}</li>
+                    <li>Fecha de nacimiento: {{ tra.fecha_nacimiento|date:"d/m/Y"|default:"-" }}</li>
+                    <li>Biografía: {{ tra.biografia|default:"-" }}</li>
+                    <li>Acepta tratamiento de salud: {{ tra.acepta_tratamiento_salud|yesno:"Sí,No" }}</li>
+                    <li>Último día activo: {{ tra.ultimo_dia_activo|date:"d/m/Y"|default:"-" }}</li>
+                </ul>
+                {% if tra.user %}
+                    <h4>Usuario del trabajador (OneToOne)</h4>
+                    <ul>
+                        <li>Nombre de usuario: {{ tra.user.username }}</li>
+                        <li>Nombre: {{ tra.user.first_name|default:"-" }}</li>
+                        <li>Apellidos: {{ tra.user.last_name|default:"-" }}</li>
+                        <li>Email: {{ tra.user.email|default:"-" }}</li>
+                        <li>Fecha de alta: {{ tra.user.date_joined|date:"d/m/Y H:i" }}</li>
+                        <li>Último acceso: {{ tra.user.last_login|date:"d/m/Y H:i"|default:"nunca" }}</li>
+                        <li>Es staff: {{ tra.user.is_staff|yesno:"Sí,No" }}</li>
+                        <li>Es superusuario: {{ tra.user.is_superuser|yesno:"Sí,No" }}</li>
+                        <li>Activo: {{ tra.user.is_active|yesno:"Sí,No" }}</li>
+                    </ul>
+                {% else %}
+                    <p>Sin cuenta de usuario asociada.</p>
+                {% endif %}
+                </div>
+            {% empty %}
+                <p>Ningún trabajador lo tiene como favorito.</p>
+            {% endfor %}
+        </div>
+        <hr>
+    {% empty %}
+        <p>No hay psicólogos con esa especialidad.</p>
+    {% endfor %}
+</body>
+</html>
